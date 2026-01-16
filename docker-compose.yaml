@@ -228,6 +228,78 @@ services:
       - iceberg-rest
       - minio
 
+  postgres:
+    image: postgres:18-alpine
+    container_name: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: default
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7.4-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    command: >
+      redis-server 
+      --requirepass "redis"
+      --appendonly yes
+      --aof-use-rdb-preamble yes
+      --save 60 1
+    volumes:
+      - redis-data:/data
+
+  authentik-server:
+    image: authentik/server:2025.12.1
+    container_name: authentik-server
+    command: server
+    environment:
+      AUTHENTIK_REDIS__HOST: redis
+      AUTHENTIK_POSTGRESQL__HOST: postgres
+      AUTHENTIK_POSTGRESQL__USER: postgres
+      AUTHENTIK_POSTGRESQL__NAME: default
+      AUTHENTIK_POSTGRESQL__PASSWORD: postgres
+      AUTHENTIK_SECRET_KEY: vA1BqQrB92Jg/zYjiB8WLc+O4WAbHfuRC4cj6t+BSbuZs07a7IdmCM+M7fK6Jg8KcSL0frxZpoe2rl5M
+      AUTHENTIK_ERROR_REPORTING__ENABLED: true
+    volumes:
+      - ./authentik/media:/media
+      - ./authentik/custom-templates:/templates
+    ports:
+      - "9002:9000"
+      - "9443:9443"
+    depends_on:
+      - postgres
+      - redis
+
+  authentik-worker:
+    image: authentik/server:2025.12.1
+    container_name: authentik-worker
+    command: worker
+    environment:
+      AUTHENTIK_REDIS__HOST: redis
+      AUTHENTIK_POSTGRESQL__HOST: postgres
+      AUTHENTIK_POSTGRESQL__USER: postgres
+      AUTHENTIK_POSTGRESQL__NAME: default
+      AUTHENTIK_POSTGRESQL__PASSWORD: postgres
+      AUTHENTIK_SECRET_KEY: vA1BqQrB92Jg/zYjiB8WLc+O4WAbHfuRC4cj6t+BSbuZs07a7IdmCM+M7fK6Jg8KcSL0frxZpoe2rl5M
+      AUTHENTIK_ERROR_REPORTING__ENABLED: true
+    user: root
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./authentik/media:/media
+      - ./authentik/custom-templates:/templates
+      - ./authentik/certs:/certs
+    depends_on:
+      - postgres
+      - redis
+
 volumes:
   mysql-data:
   minio-data:
+  postgres-data:
+  redis-data:
