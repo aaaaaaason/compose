@@ -1,0 +1,12 @@
+version: v0.11.0
+dsn: postgres://postgres:postgres@postgres:5432/keto_db?sslmode=disable
+
+serve:
+  read:
+    port: 4466
+  write:
+    port: 4467
+
+namespaces:
+  - id: 0
+    name: default

@@ -1,0 +1,30 @@
+serve:
+  proxy:
+    port: 4455
+  api:
+    port: 4456
+
+access_rules:
+  repositories:
+    - file:///etc/config/oathkeeper/rules.json
+
+authenticators:
+  anonymous: { enabled: true }
+  oauth2_introspection:
+    enabled: true
+    config:
+      introspection_url: http://hydra:4445/oauth2/introspect
+
+authorizers:
+  allow: { enabled: true }
+  keto_engine_acp_ory: # Optional: Connects to Keto
+    enabled: true
+    config:
+      base_url: http://keto:4466/
+
+mutators:
+  id_token: # This creates the JWT for your backend
+    enabled: true
+    config:
+      issuer_url: http://localhost:4455/
+      jwks_url: file:///etc/config/oathkeeper/id_token.jwks.json

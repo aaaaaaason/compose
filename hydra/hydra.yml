@@ -1,0 +1,19 @@
+version: v2.2.0
+dsn: postgres://postgres:postgres@postgres:5432/hydra_db?sslmode=disable
+
+serve:
+  public: { port: 4444 }
+  admin: { port: 4445 }
+
+urls:
+  self: { issuer: http://localhost:4444/ }
+  login: http://localhost:3000/login
+  consent: http://localhost:3000/consent
+
+secrets:
+  system:
+    - "YOU_MUST_CHANGE_THIS_SECRET_32_CHARS" # Change this!
+
+oidc:
+  subject_identifiers:
+    supported_types: [public]
