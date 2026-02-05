@@ -306,6 +306,7 @@ services:
     ports:
       - "4444:4444" # Public API
       - "4445:4445" # Admin API
+      - "4446:4446" # Admin API
     volumes:
       - ./hydra:/etc/config/hydra
     environment:
@@ -354,6 +355,16 @@ services:
       - CSRF_COOKIE_NAME=ory_kratos_ui_csrf
       # --- CRITICAL FOR LOCALHOST (HTTP) ---
       - DANGEROUSLY_DISABLE_SECURE_CSRF_COOKIES=true
+
+  hydra-ui:
+    image: oryd/hydra-login-consent-node:v25.4.0
+    container_name: hydra-ui
+    ports:
+      - "3001:3000"
+    environment:
+      - HYDRA_ADMIN_URL=http://hydra:4445
+      - NODE_TLS_REJECT_UNAUTHORIZED=0
+      - MOCK_TLS_TERMINATION=y
 
 volumes:
   mysql-data:

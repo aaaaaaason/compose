@@ -36,6 +36,9 @@ serve:
   admin:
     base_url: http://kratos:4434/
 
+oauth2_provider:
+  url: http://hydra:4445
+
 selfservice:
   default_browser_return_url: http://localhost:3000/ # Your App/UI
   methods:
